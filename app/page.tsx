@@ -1,64 +1,127 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import Navbar from "@/components/Navbar";
+import ContestRow from "@/components/ContestRow";
+import { CFContest, CFProblem, CFSubmission } from "@/types/codeforces";
 
 export default function Home() {
+  const [username, setUsername] = useState<string>("");
+  const [activeFilter, setActiveFilter] = useState<string>("All Contest");
+  const [contests, setContests] = useState<CFContest[]>([]);
+  const [problemMap, setProblemMap] = useState<Record<number, CFProblem[]>>({});
+  const [solvedSet, setSolvedSet] = useState<Set<string>>(new Set());
+  const [isLoaded, setIsLoaded] = useState(false);
+
+
+  useEffect(() => {
+    const savedHandle = localStorage.getItem("cf_handle");
+    if (savedHandle) {
+      setUsername(savedHandle);
+    }
+    setIsLoaded(true);
+  }, []);
+
+
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem("cf_handle", username);
+    }
+  }, [username, isLoaded]);
+
+
+  useEffect(() => {
+    fetch("https://codeforces.com/api/contest.list?gym=false")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === "OK") {
+          setContests(data.result.filter((c: CFContest) => c.phase === "FINISHED"));
+        }
+      });
+
+    fetch("https://codeforces.com/api/problemset.problems")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === "OK") {
+          const mapping: Record<number, CFProblem[]> = {};
+          data.result.problems.forEach((prob: CFProblem) => {
+            if (!mapping[prob.contestId]) mapping[prob.contestId] = [];
+            mapping[prob.contestId].push(prob);
+          });
+          
+          Object.keys(mapping).forEach((id) => {
+            mapping[Number(id)].sort((a, b) => a.index.localeCompare(b.index));
+          });
+          setProblemMap(mapping);
+        }
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!username.trim()) {
+      setSolvedSet(new Set());
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(() => {
+      fetch(`https://codeforces.com/api/user.status?handle=${username}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.status === "OK") {
+            const solved = new Set<string>(
+              data.result
+                .filter((sub: CFSubmission) => sub.verdict === "OK")
+                .map((sub: CFSubmission) => `${sub.contestId}${sub.problem.index}`)
+            );
+            setSolvedSet(solved);
+          } else {
+            setSolvedSet(new Set()); 
+          }
+        })
+        .catch(() => setSolvedSet(new Set()));
+    }, 600);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [username]);
+
+  const filteredContests = contests.filter((c) => {
+    if (activeFilter === "All Contest") return true;
+
+    const contestName = c.name.toLowerCase();
+    
+    if (activeFilter === "Educational") {
+      return contestName.includes("educational");
+    }
+
+    return contestName.includes(activeFilter.toLowerCase());
+  });
+
+  
+  if (!isLoaded) return <div className="h-screen w-screen bg-zinc-50" />;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <div className="flex flex-col h-screen w-screen bg-blue-50 font-sans">
+      <Navbar 
+        username={username} 
+        setUsername={setUsername} 
+        activeFilter={activeFilter} 
+        setActiveFilter={setActiveFilter} 
+      />
+      <main className=" overflow-y-auto space-y-2">
+        {filteredContests.length > 0 ? (
+          filteredContests.slice(0, 100).map((contest) => (
+            <ContestRow 
+              key={contest.id} 
+              contest={contest} 
+              problems={problemMap[contest.id] || []} 
+              solvedSet={solvedSet} 
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+          ))
+        ) : (
+          <div className="text-center py-20 text-gray-400 italic">
+            No contests found for "{activeFilter}"
+          </div>
+        )}
       </main>
     </div>
   );
