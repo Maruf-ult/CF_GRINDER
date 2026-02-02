@@ -50,10 +50,13 @@ A sleek, interactive dashboard built with **Next.js 15**, **TypeScript**, and **
 ├── types/
 │   └── codeforces.ts     # TypeScript interfaces for API responses
 └── public/               # Static assets
+```
 
-🧪 Key Implementation Logic
-Lazy-Loading Problems
+
+
+## 🧪 Key Implementation Logic
+### Lazy-Loading Problems
 To avoid hitting Codeforces rate limits (5 requests/sec), this app uses a decentralized fetching strategy. Instead of downloading every problem on Codeforces at once, each ContestRow component fetches its own data independently when it mounts.
 
-Debounced API Calls
+### Debounced API Calls
 The user status fetcher is debounced by 600ms. This prevents spamming the API while you type your username, ensuring a smooth UI and avoiding 403 Forbidden errors.
