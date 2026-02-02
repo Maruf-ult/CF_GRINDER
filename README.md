@@ -1,46 +1,46 @@
-Codeforces Progress Tracker
-A sleek, interactive dashboard built with Next.js 15, TypeScript, and Tailwind CSS. This tool allows competitive programmers to track their contest performance, see which problems they have solved, and identify gaps in their practice—all in real-time.
+# Codeforces Progress Tracker
 
-🚀 Features
-Ultimate Data Accuracy: Uses the contest.standings API for each row to ensure a 100% accurate problem list, even for regional or newly finished contests.
+A sleek, interactive dashboard built with **Next.js 15**, **TypeScript**, and **Tailwind CSS**. This tool allows competitive programmers to track their contest performance, see which problems they have solved, and identify gaps in their practice—all in real-time.
 
-Live User Sync: Enter your Codeforces handle to instantly see your progress. Solved problems turn green automatically.
+## 🚀 Features
 
-Sticky Sessions: Your handle is saved to localStorage, so your progress is right there when you return.
+* **Ultimate Data Accuracy**: Uses the `contest.standings` API for each row to ensure a 100% accurate problem list, even for regional or newly finished contests.
+* **Live User Sync**: Enter your Codeforces handle to instantly see your progress. Solved problems turn green automatically.
+* **Sticky Sessions**: Your handle is saved to `localStorage`, so your progress is right there when you return.
+* **Advanced Filtering**: One-tap filters for Div. 1-4, Educational Rounds, Global Rounds, Kotlin, CodeTON, and more.
+* **Deep Links**: Direct links to both the main contest dashboard and individual problem pages.
+* **Technical Details at a Glance**: Each problem card displays its index, name, and difficulty rating.
 
-Advanced Filtering: One-tap filters for Div. 1-4, Educational Rounds, Global Rounds, Kotlin, CodeTON, and more.
+## 🛠️ Tech Stack
 
-Deep Links: Direct links to both the main contest dashboard and individual problem pages.
+* **Framework**: Next.js 15 (App Router)
+* **Language**: TypeScript
+* **Styling**: Tailwind CSS
+* **API**: Codeforces API
 
-Technical Details at a Glance: Each problem card displays its index, name, and difficulty rating.
+## 📦 Installation & Setup
 
-🛠️ Tech Stack
-Framework: Next.js (App Router)
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/your-username/cf-tracker.git](https://github.com/your-username/cf-tracker.git)
+    cd cf-tracker
+    ```
 
-Language: TypeScript
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-Styling: Tailwind CSS
+3.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
 
-API: Codeforces API
+4.  **Open the app:** Navigate to [http://localhost:3000](http://localhost:3000) in your browser.
 
-📦 Installation & Setup
-Clone the repository:
+## 📂 Project Structure
 
-Bash
-git clone https://github.com/your-username/cf-tracker.git
-cd cf-tracker
-Install dependencies:
-
-Bash
-npm install
-Run the development server:
-
-Bash
-npm run dev
-Open the app: Navigate to http://localhost:3000 in your browser.
-
-📂 Project Structure
-Plaintext
+```plaintext
 ├── app/
 │   ├── page.tsx          # Main logic, state management, and persistence
 │   └── layout.tsx        # Global styles and layout
@@ -50,6 +50,7 @@ Plaintext
 ├── types/
 │   └── codeforces.ts     # TypeScript interfaces for API responses
 └── public/               # Static assets
+
 🧪 Key Implementation Logic
 Lazy-Loading Problems
 To avoid hitting Codeforces rate limits (5 requests/sec), this app uses a decentralized fetching strategy. Instead of downloading every problem on Codeforces at once, each ContestRow component fetches its own data independently when it mounts.
