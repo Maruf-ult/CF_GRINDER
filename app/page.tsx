@@ -16,8 +16,13 @@ export default function Home() {
 
   useEffect(() => {
     const savedHandle = localStorage.getItem("cf_handle");
+    const savedFilter = localStorage.getItem("cf_filter");
+
     if (savedHandle) {
       setUsername(savedHandle);
+    }
+    if(savedFilter){
+      setActiveFilter(savedFilter);
     }
     setIsLoaded(true);
   }, []);
@@ -26,8 +31,9 @@ export default function Home() {
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem("cf_handle", username);
+      localStorage.setItem("cf_filter",activeFilter);
     }
-  }, [username, isLoaded]);
+  }, [username,activeFilter, isLoaded]);
 
 
   useEffect(() => {
