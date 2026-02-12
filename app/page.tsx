@@ -90,16 +90,31 @@ export default function Home() {
     return () => clearTimeout(delayDebounceFn);
   }, [username]);
 
-  const filteredContests = contests.filter((c) => {
+const filteredContests = contests.filter((c) => {
     if (activeFilter === "All Contest") return true;
 
     const contestName = c.name.toLowerCase();
-    
-    if (activeFilter === "Educational") {
+    const filterLower = activeFilter.toLowerCase();
+
+    if (activeFilter === "Educational Round") {
       return contestName.includes("educational");
     }
 
-    return contestName.includes(activeFilter.toLowerCase());
+    if (activeFilter === "Div. 1 + Div. 2") {
+      return contestName.includes("div. 1 + div. 2") || contestName.includes("combined");
+    }
+
+    if (activeFilter.startsWith("Div.")) {
+      if (activeFilter === "Div. 1") {
+        return contestName.includes("div. 1") && !contestName.includes("div. 1 + div. 2");
+      }
+      if (activeFilter === "Div. 2") {
+        return contestName.includes("div. 2") && !contestName.includes("div. 1 + div. 2");
+      }
+      return contestName.includes(filterLower);
+    }
+
+    return contestName.includes(filterLower);
   });
 
   

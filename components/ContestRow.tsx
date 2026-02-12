@@ -39,7 +39,7 @@ export default function ContestRow({
     <table className="w-full border-separate border-spacing-0 border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:border-blue-400 transition-all ">
       <tbody>
         <tr>
-          <td className="w-1/4 md:w-1/5 bg-blue-50 hover:bg-blue-100 p-4 border-r border-gray-200 align-middle">
+          <td className="w-1/4 md:w-56 bg-blue-50 hover:bg-blue-100 p-4 border-r border-gray-200 align-middle">
             <div className="flex flex-col">
               <a
                 href={`https://codeforces.com/contest/${contest.id}`}
@@ -50,14 +50,14 @@ export default function ContestRow({
               >
                 {contest.name}
               </a>
-              <span className="text-[10px] text-gray-400 font-mono mt-1">
+              <span className="text-[4px] text-gray-400 font-mono mt-1">
                 ID: {contest.id}
               </span>
             </div>
           </td>
 
           <td className="pl-3 bg-white py-4">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {problems.map((prob) => {
                 const problemId = `${prob.contestId}${prob.index}`;
                 const isSolved = solvedSet.has(problemId);
